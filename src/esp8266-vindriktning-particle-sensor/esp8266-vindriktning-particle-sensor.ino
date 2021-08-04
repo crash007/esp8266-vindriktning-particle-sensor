@@ -61,7 +61,7 @@ void setup() {
 
     snprintf(identifier, sizeof(identifier), "VINDRIKTNING-%X", ESP.getChipId());
     snprintf(MQTT_TOPIC_AVAILABILITY, 127, "%s/%s/status", FIRMWARE_PREFIX, identifier);
-    snprintf(MQTT_TOPIC_STATE, 127, "%s/%s/state", FIRMWARE_PREFIX, identifier);
+    snprintf(MQTT_TOPIC_STATE, 127, "%s/%s/%s", "/v1",FIRMWARE_PREFIX, identifier);
     snprintf(MQTT_TOPIC_COMMAND, 127, "%s/%s/command", FIRMWARE_PREFIX, identifier);
 
     snprintf(MQTT_TOPIC_AUTOCONF_PM25_SENSOR, 127, "homeassistant/sensor/%s/%s_pm25/config", FIRMWARE_PREFIX, identifier);
@@ -138,7 +138,7 @@ void loop() {
 }
 
 void setupWifi() {
-    wifiManager.setDebugOutput(false);
+    wifiManager.setDebugOutput(true);
     wifiManager.setSaveConfigCallback(saveConfigCallback);
 
     wifiManager.addParameter(&custom_mqtt_server);
@@ -201,7 +201,9 @@ void publishState() {
     stateJson["wifi"] = wifiJson.as<JsonObject>();
 
     serializeJson(stateJson, payload);
-    mqttClient.publish(&MQTT_TOPIC_STATE[0], &payload[0], true);
+    //mqttClient.publish(&MQTT_TOPIC_STATE[0], &payload[0], true);
+    mqttClient.publish(&MQTT_TOPIC_STATE[0], String(state.avgPM25).c_str(), true);
+
 }
 
 void mqttCallback(char* topic, uint8_t* payload, unsigned int length) { }
